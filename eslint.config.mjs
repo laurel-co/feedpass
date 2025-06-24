@@ -5,4 +5,11 @@ export default antfu({
   typescript: true,
   javascript: true,
   lessOpinionated: true,
+}, {
+  rules: {
+    'curly': 'off',
+    'style/curly': 'off',
+    'no-console': 'off',
+    'style/no-console': 'off',
+  },
 })

@@ -1,3 +1,4 @@
+import basicSsl from '@vitejs/plugin-basic-ssl'
 import { defineConfig } from 'vite'
 import webExtension, { readJsonFile } from 'vite-plugin-web-extension'
 
@@ -14,14 +15,17 @@ function generateManifest() {
 
 export default defineConfig({
   plugins: [
+    basicSsl(),
     webExtension({
       manifest: generateManifest,
       browser: 'firefox',
-      disableAutoLaunch: true,
+      // disableAutoLaunch: true,
       watchFilePaths: ['package.json', 'manifest.json'],
       webExtConfig: {
         target: 'firefox-desktop',
-        firefoxBinary: '/usr/sbin/librewolf',
+        firefox: 'flatpak:org.mozilla.firefox',
+        args: [''],
+        startUrl: 'https://elpais.com/',
       },
     }),
   ],

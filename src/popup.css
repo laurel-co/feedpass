@@ -1,41 +1,191 @@
-html, body {
-    width: 300px;
-    height: 400px;
-    padding: 0;
-    margin: 0;
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Colors */
+    --gnome-standalone-color-oklab: max(l, 0.85) a b;
+    --gnome-destructive-bg: var(--gnome-palette-red-4);
+    --gnome-success-bg: var(--gnome-palette-green-5);
+    --gnome-warning-bg: #cd9309;
+    --gnome-error-bg: var(--gnome-palette-red-4);
+
+    --gnome-toolbar-star-button: var(--gnome-palette-yellow-1);
+
+    /* Window */
+    --gnome-window-background: #222226;
+    --gnome-window-color: white;
+    --gnome-view-background: #1e1e1e;
+    --gnome-sidebar-background: #2e2e32;
+    --gnome-secondary-sidebar-background: #28282c;
+
+    /* Card */
+    --gnome-card-background: rgba(255, 255, 255, 0.08);
+    --gnome-card-shade-color: rgba(0, 0, 6, 0.36);
+
+    /* Menu */
+    --gnome-menu-background: #36363a;
+
+    /* Header bar */
+    --gnome-headerbar-background: #2e2e32;
+    --gnome-headerbar-shade-color: rgba(0, 0, 0, 0.9);
+
+    /* Toolbars */
+    --gnome-toolbar-icon-fill: #ffffff;
+
+    /* Tabs */
+    --gnome-tabbar-tab-hover-background: #3d3d40; /* Hardcoded color */
+    --gnome-tabbar-tab-active-background: #434346; /* Hardcoded color */
+    --gnome-tabbar-tab-active-background-contrast: #4f4f4f; /* Hardcoded color */
+    --gnome-tabbar-tab-active-hover-background: #49494d; /* Hardcoded color */
+
+    --gnome-tabbar-identity-color-green: var(--gnome-palette-green-1);
+    --gnome-tabbar-identity-color-yellow: var(--gnome-palette-yellow-2);
+    --gnome-tabbar-identity-color-orange: var(--gnome-palette-orange-3);
+    --gnome-tabbar-identity-color-red: var(--gnome-palette-red-1);
+    --gnome-tabbar-identity-color-purple: var(--gnome-palette-purple-1);
+
+    /* Miscellaneous */
+    --gnome-shade-color: rgba(0, 0, 6, 0.25);
+
+    /* Text color for Firefox Logo in new private tab */
+    --gnome-private-wordmark: #fbfbfe;
+    /* New private tab background */
+    --gnome-private-in-content-page-background: #222226;
+    /* Private browsing info box */
+    --gnome-private-text-primary-color: #fbfbfe;
+
+    /* Backdrop colors */
+    &:-moz-window-inactive {
+      --gnome-tabbar-tab-hover-background: #2a2a2e; /* Hardcoded color */
+      --gnome-tabbar-tab-active-background: #2d2d31; /* Hardcoded color */
+      --gnome-sidebar-background: #28282c;
+      --gnome-secondary-sidebar-background: #252529;
+      --gnome-selection-bg: color-mix(in srgb, var(--gnome-view-color) 10%, transparent);
+    }
+
+    /* Private browsing colors */
+    &[privatebrowsingmode='temporary'] {
+      /* Headerbar */
+      --gnome-headerbar-background: var(--gnome-accent-bg) !important;
+      /* Tabs */
+      --gnome-tabbar-tab-hover-background: #6c438c; /* Hardcoded color */
+      --gnome-tabbar-tab-active-background: #70498f; /* Hardcoded color */
+      --gnome-tabbar-tab-active-background-contrast: #86689e; /* Hardcoded color */
+      --gnome-tabbar-tab-active-hover-background: #754f93; /* Hardcoded color */
+
+      /* Private and backdrop colors */
+      &:-moz-window-inactive {
+        --gnome-tabbar-tab-hover-background: #673c87; /* Hardcoded color */
+        --gnome-tabbar-tab-active-background: #683f89; /* Hardcoded color */
+      }
+    }
+  }
+}
+
+html,
+body {
+  color: var(--gnome-window-color);
+  background-color: var(--gnome-window-background);
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    'Adwaita Sans',
+    Cantarell,
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif;
 }
 
 body {
+  width: 60ch;
+}
+
+header {
+  position: relative;
+}
+
+.header-navbar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin: 0;
+  padding: 0;
+}
+
+.feed-item {
+  & img {
+    width: 24px;
+  }
+
+  & header {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    background-color: rgb(36, 36, 36);
+    gap: 0.8rem;
+  }
+
+  & .feed {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  & .buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+
+    & svg {
+      --size: 24px;
+      width: var(--size);
+      height: var(--size);
+      cursor: pointer;
+    }
+  }
 }
 
-img {
-    width: 200px;
-    height: 200px;
-}
-
-h1 {
-    font-size: 18px;
-    color: white;
-    font-weight: bold;
+.feed-text {
+  & * {
+    padding: 0;
     margin: 0;
-}
+    font-size: 15px;
+  }
 
-p {
-    color: white;
-    opacity: 0.7;
-    margin: 0;
-}
+  & h4 {
+    line-height: 2;
+    word-wrap: break-word;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
 
+  & p {
+    line-height: 1.3;
+    word-wrap: break-word;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
 
-code {
-    font-size: 12px;
-    padding: 2px 4px;
-    background-color: #ffffff24;
-    border-radius: 2px;
+  & a {
+    line-height: 1.6;
+  }
 }

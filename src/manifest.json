@@ -1,6 +1,6 @@
 {
   "{{chrome}}.manifest_version": 3,
-  "{{firefox}}.manifest_version": 2,
+  "{{firefox}}.manifest_version": 3,
   "icons": {
     "16": "icon/16.png",
     "32": "icon/32.png",
@@ -8,14 +8,24 @@
     "96": "icon/96.png",
     "128": "icon/128.png"
   },
-  "{{chrome}}.action": {
-    "default_popup": "src/popup.html"
-  },
-  "{{firefox}}.browser_action": {
+  "permissions": [
+    "storage"
+  ],
+  "action": {
     "default_popup": "src/popup.html"
   },
   "background": {
     "{{chrome}}.service_worker": "src/background.ts",
     "{{firefox}}.scripts": ["src/background.ts"]
-  }
+  },
+ 	"content_security_policy": {
+		"extension_pages": "default-src 'self'; script-src 'self'; object-src 'self'"
+	},
+	"content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["src/content.ts"],
+      "all_frames": true
+    }
+  ]
 }
