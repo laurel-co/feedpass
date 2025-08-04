@@ -1,18 +1,36 @@
 import type { FeedType } from './feedTypes'
 
-export interface Feed {
+interface Author {
+  name: string
+  url?: string
+  avatarUrl?: string
+}
+
+/**
+ * Saved Feed on DB
+ */
+interface Feed {
   title: string
   description?: string
-  href: string
-  viewedAt: number
+  feedUrl: string
+  homeUrl: string
+  authors?: Author[]
+  foundAt: number
+  icon: string // ? feed provided icon otherwise website favicon
   // todo: icon: string
 }
 
-export interface NewFeed {
-  title: string
-  description?: string
-  href: string
-  viewedAt: number
+/**
+ * Fetched Feed by URL nav icon with extra properties for differentiation
+ */
+interface NewFeed extends Feed {
   type: FeedType
-  // todo: icon: string
+  tags: string[]
+  lastUpdate: Date
+}
+
+export {
+  Author,
+  Feed,
+  NewFeed,
 }

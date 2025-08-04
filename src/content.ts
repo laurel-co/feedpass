@@ -1,22 +1,7 @@
-import type { Feed } from 'lib/types'
+import type { Feed } from './lib/types'
 import browser from 'webextension-polyfill'
-
-export const FeedTypes = [
-  'application/feed+json',
-  'application/rss+xml',
-  'application/atom+xml',
-  'application/rdf+xml',
-  'application/json',
-  'application/rss',
-  'application/atom',
-  'application/rdf',
-  'text/rss+xml',
-  'text/atom+xml',
-  'text/rdf+xml',
-  'text/rss',
-  'text/atom',
-  'text/rdf',
-]
+import { FeedMimeTypes } from './lib/feedTypes'
+import parseFeed from './lib/parser'
 
 function getCurrentUrlSanitized() {
   const url = new URL(window.location.toString())
@@ -42,36 +27,48 @@ function getCurrentUrlSanitized() {
 let currentUrlSanitized = getCurrentUrlSanitized()
 const hrefs: Set<string> = new Set()
 
-function sendHrefs() {
+async function sendHrefs() {
   const elements = document.querySelectorAll(':is(link, a)[rel=alternate][type][href]')
 
   for (const element of elements) {
     if (!element) continue
     if (!element.hasAttribute('type') || !element.hasAttribute('href')) continue
     const type = element.getAttribute('type')!
-    const isSupportedFeedType = FeedTypes.includes(type)
+    const isSupportedFeedType = FeedMimeTypes.includes(type as any)
     if (!isSupportedFeedType) continue
     const title = element.getAttribute('title')
     const description = element.getAttribute('description')
-    let href = element.getAttribute('href')!
+    let feedUrl = element.getAttribute('href')!
 
-    if (href.startsWith('/')) {
-      href = `https://${window.location.host}${href}`
+    if (feedUrl.startsWith('/')) {
+      feedUrl = `https://${window.location.host}${feedUrl}`
     }
 
     // If feed's url starts with "//"
-    if (href.startsWith('//')) {
-      href = `http:${href}`
+    if (feedUrl.startsWith('//')) {
+      feedUrl = `http:${feedUrl}`
     }
 
-    if (href && !hrefs.has(href)) {
-      hrefs.add(href)
+    if (feedUrl && !hrefs.has(feedUrl)) {
+      hrefs.add(feedUrl)
+
+      const crawledFeed = await parseFeed(
+        type.includes('atom') ? 'atom' : type.includes('rss') ? 'rss' : 'json',
+        feedUrl,
+      )
+      console.debug('crawled feed', crawledFeed, type, feedUrl)
+      if (!crawledFeed) continue
 
       const newFeed: Partial<Feed> = {
-        title: title ?? undefined,
-        description: description ?? undefined,
-        href,
+        title: crawledFeed.title || title || undefined,
+        description: crawledFeed.description || description || undefined,
+        feedUrl: crawledFeed.feedUrl || feedUrl,
+        homeUrl: crawledFeed.homeUrl || currentUrlSanitized,
+        foundAt: Date.now(),
+        authors: crawledFeed.authors,
+        icon: crawledFeed.icon,
       }
+      if (!newFeed.title) continue
 
       const message = {
         name: 'NEW_FEED',
@@ -80,7 +77,7 @@ function sendHrefs() {
       browser.runtime.sendMessage(message)
     }
     else {
-      console.debug(`Ignored ${href} because already is in store, store:`, hrefs.values().toArray())
+      console.debug(`Ignored ${feedUrl} because already is in store, store:`, hrefs.values().toArray())
     }
   }
 }

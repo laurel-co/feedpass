@@ -1,4 +1,4 @@
-export const FeedTypes = [
+export const FeedMimeTypes = [
   'application/feed+json',
   'application/rss+xml',
   'application/atom+xml',
@@ -13,6 +13,14 @@ export const FeedTypes = [
   'text/rss',
   'text/atom',
   'text/rdf',
+] as const
+export type FeedMimeType = typeof FeedMimeTypes[number]
+
+// todo: is it useful?
+export const FeedTypes = [
+  'rss',
+  'atom',
+  'json',
 ] as const
 
 export type FeedType = typeof FeedTypes[number]
