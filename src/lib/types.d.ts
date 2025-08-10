@@ -15,7 +15,7 @@ interface Feed {
   feedUrl: string
   homeUrl: string
   authors?: Author[]
-  foundAt: number
+  foundAt: number // unix timestamp
   icon: string // ? feed provided icon otherwise website favicon
   // todo: icon: string
 }
@@ -26,7 +26,7 @@ interface Feed {
 interface NewFeed extends Feed {
   type: FeedType
   tags: string[]
-  lastUpdate: Date
+  lastUpdate: number // unix timestamp
 }
 
 export {

@@ -18,10 +18,10 @@
     "{{chrome}}.service_worker": "src/background.ts",
     "{{firefox}}.scripts": ["src/background.ts"]
   },
- 	"content_security_policy": {
-		"extension_pages": "default-src 'self'; script-src 'self'; object-src 'self'"
-	},
-	"content_scripts": [
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "content_scripts": [
     {
       "matches": ["https://*/*", "http://*/*"],
       "js": ["src/content.ts"],

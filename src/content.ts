@@ -1,30 +1,10 @@
 import type { Feed } from './lib/types'
 import browser from 'webextension-polyfill'
+import { absolutify, isValid, purify } from '../src/utils'
 import { FeedMimeTypes } from './lib/feedTypes'
 import parseFeed from './lib/parser'
 
-function getCurrentUrlSanitized() {
-  const url = new URL(window.location.toString())
-
-  // Delete hash
-  url.hash = ''
-
-  // Delete UTM parameters https://en.wikipedia.org/wiki/UTM_parameters#UTM_parameters
-  url.searchParams.delete('utm_source')
-  url.searchParams.delete('utm_medium')
-  url.searchParams.delete('utm_campaign')
-  url.searchParams.delete('utm_term')
-  url.searchParams.delete('utm_content')
-
-  // Delete yahoo trackers https://github.com/brave/adblock-lists/pull/978/files
-  url.searchParams.delete('guccounter')
-  url.searchParams.delete('guce_referrer')
-  url.searchParams.delete('guce_referrer_sig')
-
-  return url.toString()
-}
-
-let currentUrlSanitized = getCurrentUrlSanitized()
+let currentUrlSanitized = purify(window.location.toString())
 const hrefs: Set<string> = new Set()
 
 async function sendHrefs() {
@@ -41,13 +21,17 @@ async function sendHrefs() {
     let feedUrl = element.getAttribute('href')!
 
     if (feedUrl.startsWith('/')) {
-      feedUrl = `https://${window.location.host}${feedUrl}`
+      feedUrl = absolutify(feedUrl)
     }
 
     // If feed's url starts with "//"
     if (feedUrl.startsWith('//')) {
       feedUrl = `http:${feedUrl}`
     }
+
+    feedUrl = absolutify(feedUrl)
+
+    if (!isValid(feedUrl)) continue
 
     if (feedUrl && !hrefs.has(feedUrl)) {
       hrefs.add(feedUrl)
@@ -69,6 +53,7 @@ async function sendHrefs() {
         icon: crawledFeed.icon,
       }
       if (!newFeed.title) continue
+      console.debug('final feed', newFeed)
 
       const message = {
         name: 'NEW_FEED',
@@ -83,7 +68,7 @@ async function sendHrefs() {
 }
 
 new MutationObserver(() => {
-  const testCurrentUrlSanitized = getCurrentUrlSanitized()
+  const testCurrentUrlSanitized = purify(window.location.toString())
   if (currentUrlSanitized !== testCurrentUrlSanitized) {
     currentUrlSanitized = testCurrentUrlSanitized
     console.debug('Cleared URLs')

@@ -1,6 +1,7 @@
 import type { JsonFeed } from './feed-types/json'
 import type { FeedType } from './feedTypes'
 import type { Author, Feed, NewFeed } from './types'
+import { toUnix } from '../utils'
 
 interface Response {
   type: '' | 'document' | 'json' | 'text' | 'arraybuffer'
@@ -14,11 +15,27 @@ function makeRequest(method: string, url: string): Promise<Response> {
     xhr.open(method, url)
     xhr.onload = function () {
       if (this.status >= 200 && this.status < 300) {
-        console.debug(!!this.responseXML, this.responseType)
+        let response = this.responseXML || this.response
+        let responseType = this.responseType
+
+        if (!responseType) {
+          try {
+            JSON.parse(this.response)
+            responseType = 'json'
+          }
+          catch {
+            responseType = 'text'
+          }
+          if (responseType === 'json') {
+            response = JSON.parse(this.response)
+          }
+        }
+
+        console.debug('res', !!this.responseXML, responseType)
         resolve({
-          response: this.responseXML || this.response,
+          response,
           // @ts-expect-error ignore shitty api types
-          type: this.responseXML ? 'document' : this.responseType,
+          type: this.responseXML ? 'document' : responseType,
         })
       }
       else {
@@ -53,11 +70,11 @@ export default async function parseFeed(feedType: FeedType, url: string): Promis
       : undefined
 
     const lastUpdate = document.items
-      ? new Date(document.items
-        .filter(d => d.date_published)
-        .reduce((a, b) => new Date(a.date_published).getTime() > new Date(b.date_published).getTime() ? a : b)
-        .date_published,
-      )
+      ? toUnix(new Date(document.items
+          .filter(d => d.date_published)
+          .reduce((a, b) => new Date(a.date_published).getTime() > new Date(b.date_published).getTime() ? a : b)
+          .date_published,
+        ))
       : undefined
 
     return {
@@ -92,13 +109,13 @@ export default async function parseFeed(feedType: FeedType, url: string): Promis
     // Find the most recent updated/published date
     const entries = Array.from(document.querySelectorAll('entry'))
     const lastUpdate = entries.length
-      ? new Date(
-        entries
-          .map(e => e.querySelector('updated')?.textContent || e.querySelector('published')?.textContent)
-          .filter(Boolean)
-          .sort()
-          .reverse()[0] as string,
-      )
+      ? toUnix(new Date(
+          entries
+            .map(e => e.querySelector('updated')?.textContent || e.querySelector('published')?.textContent)
+            .filter(Boolean)
+            .sort()
+            .reverse()[0] as string,
+        ))
       : undefined
 
     return {
@@ -130,13 +147,13 @@ export default async function parseFeed(feedType: FeedType, url: string): Promis
 
     const items = Array.from(channel?.querySelectorAll('item') || [])
     const lastUpdate = items.length
-      ? new Date(
-        items
-          .map(i => i.querySelector('pubDate')?.textContent)
-          .filter(Boolean)
-          .sort()
-          .reverse()[0] as string,
-      )
+      ? toUnix(new Date(
+          items
+            .map(i => i.querySelector('pubDate')?.textContent)
+            .filter(Boolean)
+            .sort()
+            .reverse()[0] as string,
+        ))
       : undefined
 
     console.debug('aaa', getText('channel > description'))

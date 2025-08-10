@@ -1,15 +1,15 @@
 {
   "name": "feedpass",
-  "private": true,
-  "version": "0.0.1",
   "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@10.12.4",
   "scripts": {
     "compile": "tsc --noEmit",
     "dev": "vite",
     "build": "vite build && nr zip",
     "zip": "cd dist && zip -r ../feedpass.zip ./"
   },
-  "packageManager": "pnpm@10.12.4",
   "devDependencies": {
     "@antfu/eslint-config": "^4.14.1",
     "@types/webextension-polyfill": "^0.12.3",
