@@ -1,4 +1,4 @@
-import type { Feed } from './lib/types'
+import type { NewFeed } from './lib/types'
 import browser from 'webextension-polyfill'
 import { absolutify, isValid, purify } from '../src/utils'
 import { FeedMimeTypes } from './lib/feedTypes'
@@ -43,7 +43,7 @@ async function sendHrefs() {
       console.debug('crawled feed', crawledFeed, type, feedUrl)
       if (!crawledFeed) continue
 
-      const newFeed: Partial<Feed> = {
+      const newFeed: Partial<NewFeed> = {
         title: crawledFeed.title || title || undefined,
         description: crawledFeed.description || description || undefined,
         feedUrl: crawledFeed.feedUrl || feedUrl,
@@ -51,6 +51,7 @@ async function sendHrefs() {
         foundAt: Date.now(),
         authors: crawledFeed.authors,
         icon: crawledFeed.icon,
+        ...crawledFeed,
       }
       if (!newFeed.title) continue
       console.debug('final feed', newFeed)

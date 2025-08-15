@@ -1,6 +1,7 @@
 import type { JsonFeed } from './feed-types/json'
 import type { FeedType } from './feedTypes'
 import type { Author, Feed, NewFeed } from './types'
+import dayjs from 'dayjs'
 import { toUnix } from '../utils'
 
 interface Response {
@@ -69,12 +70,9 @@ export default async function parseFeed(feedType: FeedType, url: string): Promis
         : [{ name: document.author! }]
       : undefined
 
-    const lastUpdate = document.items
-      ? toUnix(new Date(document.items
-          .filter(d => d.date_published)
-          .reduce((a, b) => new Date(a.date_published).getTime() > new Date(b.date_published).getTime() ? a : b)
-          .date_published,
-        ))
+    const lastEntryDate = document.items && document.items[0] && document.items[0].date_published
+    const lastUpdate = lastEntryDate
+      ? dayjs(lastEntryDate).unix()
       : undefined
 
     return {
@@ -108,14 +106,10 @@ export default async function parseFeed(feedType: FeedType, url: string): Promis
 
     // Find the most recent updated/published date
     const entries = Array.from(document.querySelectorAll('entry'))
-    const lastUpdate = entries.length
-      ? toUnix(new Date(
-          entries
-            .map(e => e.querySelector('updated')?.textContent || e.querySelector('published')?.textContent)
-            .filter(Boolean)
-            .sort()
-            .reverse()[0] as string,
-        ))
+    const lastEntryDate = entries[0]
+      && (entries[0].querySelector('updated')?.textContent || entries[0].querySelector('published')?.textContent)
+    const lastUpdate = lastEntryDate
+      ? dayjs(lastEntryDate).unix()
       : undefined
 
     return {
@@ -146,15 +140,11 @@ export default async function parseFeed(feedType: FeedType, url: string): Promis
       : undefined
 
     const items = Array.from(channel?.querySelectorAll('item') || [])
-    const lastUpdate = items.length
-      ? toUnix(new Date(
-          items
-            .map(i => i.querySelector('pubDate')?.textContent)
-            .filter(Boolean)
-            .sort()
-            .reverse()[0] as string,
-        ))
+    const lastEntryDate = items[0] && items[0].querySelector('pubDate')?.textContent
+    const lastUpdate = lastEntryDate
+      ? dayjs(lastEntryDate).unix()
       : undefined
+    console.debug('last entry', lastEntryDate, lastUpdate)
 
     console.debug('aaa', getText('channel > description'))
 

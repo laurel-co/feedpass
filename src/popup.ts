@@ -1,5 +1,10 @@
-import type { Feed } from 'lib/types'
+import type { NewFeed } from 'lib/types'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
 import browser from 'webextension-polyfill'
+
+dayjs.extend(relativeTime)
 
 function dayKey(ts: number) {
   const d = new Date(ts)
@@ -12,7 +17,10 @@ function dayKey(ts: number) {
 }
 function formatSectionTitle(ts: number) {
   const date = new Date(ts)
-  return new Intl.DateTimeFormat(navigator.language, { day: '2-digit', month: 'short' }).format(date)
+  return new Intl.DateTimeFormat(navigator.language, {
+    day: '2-digit',
+    month: 'long',
+  }).format(date)
 }
 
 function getFavicon(url: string, fallback?: string) {
@@ -25,7 +33,7 @@ function getFavicon(url: string, fallback?: string) {
   }
 }
 
-function renderFeedItem(feed: Feed) {
+function renderFeedItem(feed: NewFeed) {
   const li = document.createElement('li')
   li.className = 'feed-item'
 
@@ -36,19 +44,32 @@ function renderFeedItem(feed: Feed) {
   const header = document.createElement('header')
 
   const img = document.createElement('img')
+  img.className = 'feed-icon'
   img.src = feed.icon || getFavicon(feed.homeUrl)
   img.alt = ''
 
   const feedText = document.createElement('div')
   feedText.className = 'feed-text'
 
+  const feedTitleSect = document.createElement('div')
+  feedTitleSect.className = 'feed-title-section'
+
   const title = document.createElement('h4')
+  title.className = 'feed-title'
   title.textContent = feed.title
 
+  const lastUpdate = document.createElement('span')
+  lastUpdate.className = 'feed-lastupdate'
+  lastUpdate.textContent = `Active ${dayjs.unix(feed.lastUpdate).fromNow()}`
+
+  feedTitleSect.appendChild(title)
+  feedTitleSect.appendChild(lastUpdate)
+
   const desc = document.createElement('p')
+  desc.className = 'feed-description'
   desc.textContent = feed.description || ''
 
-  feedText.appendChild(title)
+  feedText.appendChild(feedTitleSect)
   feedText.appendChild(desc)
   header.appendChild(img)
   header.appendChild(feedText)
@@ -73,12 +94,12 @@ function renderFeedItem(feed: Feed) {
   `
 
   article.appendChild(header)
-  article.appendChild(buttons)
+  // article.appendChild(buttons)
   li.appendChild(article)
   return li
 }
 
-function renderSection(dateTs: number, items: Feed[]) {
+function renderSection(dateTs: number, items: NewFeed[]) {
   const section = document.createElement('section')
   section.className = 'feed-section'
 
@@ -99,7 +120,7 @@ function renderSection(dateTs: number, items: Feed[]) {
 }
 
 async function main() {
-  const stored = await browser.storage.local.get() as unknown as Record<string, Feed>
+  const stored = await browser.storage.local.get() as unknown as Record<string, NewFeed>
   const feeds = Object.values(stored || {})
 
   const mainEl = document.getElementById('feeds')
@@ -112,7 +133,7 @@ async function main() {
   feeds.sort((a, b) => (b.foundAt || 0) - (a.foundAt || 0))
 
   // Agrupa por día local
-  const groups = new Map<string, { ts: number, items: Feed[] }>()
+  const groups = new Map<string, { ts: number, items: NewFeed[] }>()
   for (const feed of feeds) {
     const key = dayKey(feed.foundAt || Date.now())
     const bucket = groups.get(key)

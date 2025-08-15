@@ -7,8 +7,11 @@
   "scripts": {
     "compile": "tsc --noEmit",
     "dev": "vite",
-    "build": "vite build && nr zip",
+    "build": "rimraf dist/ && vite build && nr zip",
     "zip": "cd dist && zip -r ../feedpass.zip ./"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.14.1",
@@ -16,6 +19,7 @@
     "@vitejs/plugin-basic-ssl": "^2.0.0",
     "eslint": "^9.29.0",
     "eslint-plugin-format": "^1.0.1",
+    "rimraf": "^6.0.1",
     "typescript": "^5.8.3",
     "vite": "^5.4.19",
     "vite-plugin-web-extension": "^4.4.5",

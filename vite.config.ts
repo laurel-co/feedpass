@@ -23,9 +23,9 @@ export default defineConfig({
       watchFilePaths: ['package.json', 'manifest.json'],
       webExtConfig: {
         target: 'firefox-desktop',
-        firefox: 'flatpak:org.mozilla.firefox',
+        firefox: 'flatpak:org.mozilla.FirefoxDev',
         args: [''],
-        startUrl: 'https://elpais.com/',
+        startUrl: 'moz-extension://30f47bc9-4bc9-4b67-be47-7f02b09b3e9e/src/popup.html',
       },
     }),
   ],

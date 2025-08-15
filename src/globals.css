@@ -1,0 +1,20 @@
+:root {
+  --primary: hsla(311, 100%, 50%, 0.3);
+
+  --text-primary: hsla(0, 0%, 0%, 0.82);
+  --text-muted: hsla(0, 0%, 0%, 0.38);
+
+  --border-primary: hsla(0, 0%, 0%, 0.08);
+  --border-red: hsla(0, 0%, 0%, 0.06);
+
+  --bg-red: hsla(0, 86%, 64%, 1);
+  --bg-gray: hsla(0, 0%, 0%, 0.1);
+
+  --radius-btn: 12px;
+  --radius-icon: 11px;
+  --radius-icon-small: 6px;
+
+  --icon: 43px;
+
+  --gradient-bg: linear-gradient(180deg, hsla(311, 100%, 50%, 0.3) 0%, hsla(0, 0%, 100%, 0) 100%);
+}

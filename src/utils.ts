@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 export const isValid = (url = '') => {
   try {
     const ourl = new URL(url)
@@ -8,7 +10,7 @@ export const isValid = (url = '') => {
   }
 }
 
-export const toUnix = (date: Date) => Math.floor(date.getTime() / 1000)
+export const toUnix = (date: Date) => dayjs(date).unix()
 
 export const absolutify = (relativeUrl = '', fullUrl = document.baseURI) => {
   try {
